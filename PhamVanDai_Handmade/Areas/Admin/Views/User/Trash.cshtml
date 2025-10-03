@@ -1,0 +1,80 @@
+﻿@model IEnumerable<PhamVanDai_Handmade.Models.ViewModels.UserViewModel>
+
+@{
+    ViewData["Title"] = "Trash";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý tài khoản</h1>
+    </div><!-- End Page Title -->
+
+    <div class="mb-3">
+        <a asp-action="Index" asp-controller="User" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Danh sách tài khoản đã xóa</h5>
+
+                        <!-- Table with stripped rows -->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tên tài khoản</th>
+                                    <th>Email</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Quyền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.UserName</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.PhoneNumber</td>
+                                        <td>@item.RoleName</td>
+                                        <td>
+                                            <span class="badge @(item.Status == 1 ? "bg-success" : "bg-secondary")">
+                                                @(item.Status == 1 ? "Hoạt động" : "Khóa")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form asp-action="Restore" asp-controller="User" asp-route-id="@item.Id" method="post"
+                                                  onsubmit="return confirm('Bạn chắc chắn muốn khôi phục tài khoản này?');"
+                                                  style="display:inline;">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fa fa-undo"></i> Khôi phục
+                                                </button>
+                                            </form>
+                                            |
+                                            <form asp-action="DeletePermen" asp-controller="User" asp-route-id="@item.Id" method="post"
+                                                  onsubmit="return confirm('Bạn chắc chắn muốn xóa vĩnh viễn tài khoản này?');"
+                                                  style="display:inline;">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Xóa vĩnh viễn
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->

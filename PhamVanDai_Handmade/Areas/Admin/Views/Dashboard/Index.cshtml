@@ -1,0 +1,212 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var statusLabels = new[] { "Chờ xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành", "Hoàn trả", "Đã hủy" };
+    var statusIcons = new[] { "bi-hourglass-split", "bi-check2-circle", "bi-truck", "bi-patch-check-fill", "bi-arrow-counterclockwise", "bi-x-circle" };
+    var statusColors = new[] { "text-warning", "text-primary", "text-info", "text-success", "text-secondary", "text-danger" };
+}
+
+
+<main id="main" class="main">
+    <section class="section">
+        <div class="container-fluid">
+            <!-- Bộ lọc tháng + nút Xuất PDF -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <form method="get" class="d-flex">
+                    <select name="month" class="form-select me-2" style="width:150px;">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(m == ViewBag.Month)">
+                                Tháng @m
+                            </option>
+                        }
+                    </select>
+                    <select name="year" class="form-select me-2" style="width:150px;">
+                        @for (int y = DateTime.Now.Year - 5; y <= DateTime.Now.Year; y++)
+                        {
+                            <option value="@y" selected="@(y == ViewBag.Year)">
+                                @y
+                            </option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Xem
+                    </button>
+                </form>
+
+                <!-- Nút xuất PDF -->
+                <button id="btnExport" class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+                </button>
+            </div>
+
+            <div id="export-pdf">
+                <!-- Cards -->
+                <div class="row mb-4">
+                    <!-- Doanh thu kỳ vọng -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card info-card sales-card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu kỳ vọng</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h4>@ViewBag.ExpectedRevenue.ToString("N0") VND</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doanh thu thực nhận -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card info-card revenue-card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu thực nhận</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-wallet2"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h4>@ViewBag.ActualRevenue.ToString("N0") VND</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card info-card shadow">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="card-icon rounded-circle bg-light p-3 me-3">
+                                    <i class="bi bi-bag-check text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="card-title">Đơn hàng</h6>
+                                    <p class="h4">@ViewBag.TotalOrders</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card info-card shadow">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="card-icon rounded-circle bg-light p-3 me-3">
+                                    <i class="bi bi-people text-info fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="card-title">Khách hàng mới</h6>
+                                    <p class="h4 ">@ViewBag.NewCustomers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thống kê trạng thái + Top sản phẩm bán chạy -->
+                <div class="row mb-4">
+                    <!-- Trạng thái đơn hàng -->
+                    <div class="col-lg-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header">
+                                <i class="bi bi-list-task"></i> Trạng thái đơn hàng
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    @for (int i = 0; i < 6; i++)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="bi @statusIcons[i] @statusColors[i] me-2"></i>
+                                                @statusLabels[i]
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">
+                                                @((ViewBag.StatusList[i].Count))
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top 5 sản phẩm bán chạy -->
+                    <div class="col-lg-8">
+                        <div class="card shadow h-100">
+                            <div class="card-header">
+                                <i class="bi bi-bar-chart-line"></i> Top 5 sản phẩm bán chạy
+                            </div>
+                            <div class="card-body">
+                                <canvas id="topProductsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+    </section>
+</main>
+
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        const ctx = document.getElementById('topProductsChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+             ((IEnumerable<dynamic>)ViewBag.TopProducts).Select(p => p.ProductName)
+         )),
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+               ((IEnumerable<dynamic>)ViewBag.TopProducts).Select(p => p.QuantitySold)
+           )),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+                document.getElementById("btnExport").addEventListener("click", function () {
+            var element = document.getElementById("export-pdf");
+
+            var opt = {
+                margin:       5,
+                filename:     '@ViewBag.FileName',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  {
+                    scale: 2,               // tăng chất lượng ảnh
+                    windowWidth: 1500       // giả lập viewport laptop (có thể đổi 1200, 1440 tùy layout bạn đang xài)
+                },
+                jsPDF:        {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'landscape'   // ngang A4
+                }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        });
+
+    </script>
+}

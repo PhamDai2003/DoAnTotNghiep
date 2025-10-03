@@ -1,0 +1,137 @@
+﻿@using X.PagedList.Mvc.Core
+
+@model X.PagedList.IPagedList<PhamVanDai_Handmade.Models.CouponModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Quản lý mã giảm giá</h1>
+    </div><!-- End Page Title -->
+
+    <p>
+        <a asp-action="Create" asp-controller="Coupon" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tạo mã giảm giá
+        </a>
+        <a asp-action="Trash" asp-controller="Coupon" class="btn btn-danger">
+            <i class="bi bi-trash3"></i>
+        </a>
+    </p>
+    <!-- Form lọc -->
+    <section class="section mb-3">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Index" asp-controller="Product" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Tên mã giảm giá</label>
+                        <input type="text" name="code" class="form-control" placeholder="Nhập tên mã giảm giá...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái hiển thị</label>
+                        <select name="date" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="@DateTime.Now">Hoạt động</option>
+                            <option value="@DateTime.Now">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tình trạng</label>
+                        <select name="status" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="2">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Danh sách mã giảm giá</h5>
+
+                        <!-- Table with stripped rows -->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã code</th>
+                                    <th>Mô tả</th>
+                                    <th>Số lượng còn</th>
+                                    <th>Tình trạng</th>
+                                    <th>Trạng thái</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.Code)</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.quantity</td>
+                                        <td>
+                                            <span class="badge @(@item.EndDate > DateTime.Now ? "bg-success" : "bg-danger")">
+                                                @(@item.EndDate > DateTime.Now ? "Còn hạn" : "Hết hạn")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @(item.status == 1 ? "bg-success" : "bg-secondary")">
+                                                @(item.status == 1 ? "Hoạt động" : "Ẩn")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a asp-action="Edit" asp-controller="Coupon" asp-route-id="@item.CouponID" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </a>
+                                            |
+                                            <a asp-action="Detail" asp-route-id="@item.CouponID" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i> Details
+                                            </a>
+                                            |
+                                            <form asp-action="Delete" asp-controller="Coupon" asp-route-id="@item.CouponID" method="post"
+                                                  onsubmit="return confirm('Bạn chắc chắn muốn xóa coupon này?');"
+                                                  style="display:inline;">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+                        <div class="d-flex justify-content-center">
+                            @Html.PagedListPager(
+                                     Model,
+                                     page => Url.Action("Index", new { page }),
+                                     new PagedListRenderOptions
+                            {
+                                LiElementClasses = new[] { "page-item" },
+                                PageClasses = new[] { "page-link" },
+                                UlElementClasses = new[] { "pagination", "pagination-sm" },
+                                DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                                DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                                DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                                DisplayLinkToNextPage = PagedListDisplayMode.Always
+                            }
+                                     )
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->

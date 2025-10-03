@@ -1,0 +1,432 @@
+﻿@using PhamVanDai_Handmade.Models.ViewModels
+@model ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Product.ProductName;
+}
+
+<style>
+    /* --- Kỹ thuật ẩn nút radio gốc --- */
+    .product__details__option input[type="radio"] {
+    display: none;
+    }
+
+    /* --- Tùy chỉnh CHUNG cho các nút tùy chọn (Size và Color) --- */
+    .product__details__option__size label,
+    .product__details__option__color label {
+    display: inline-block;
+    padding: 8px 15px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px; /* Thêm để các nút không dính vào nhau nếu xuống dòng */
+    transition: all 0.3s ease;
+    min-width: 45px;
+    }
+
+    /* --- Hiệu ứng Hover CHUNG --- */
+    .product__details__option__size label:hover,
+    .product__details__option__color label:hover {
+    border-color: #7fad39;
+    color: #7fad39;
+    }
+
+    /* --- Giao diện KHI ĐƯỢC CHỌN (CHUNG) --- */
+    .product__details__option__size input[type="radio"]:checked + label,
+    .product__details__option__color input[type="radio"]:checked + label {
+    background-color: #7fad39;
+    color: white;
+    border-color: #7fad39;
+    }
+
+    /* --- Giao diện KHI BỊ VÔ HIỆU HÓA (CHUNG) --- */
+    .product__details__option input[type="radio"]:disabled + label {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #f5f5f5 !important;
+    color: #b7b7b7 !important;
+    border-color: #e5e5e5 !important;
+    box-shadow: none !important;
+    }
+</style>
+
+<section class="hero hero-normal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <vc:categories></vc:categories>
+            </div>
+            <div class="col-lg-9">
+                @Html.Partial("_SearchPartial")
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="breadcrumb-section set-bg" data-setbg="/User/img/breadcrumb.png">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>@Model.Product.ProductName</h2>
+                    <div class="breadcrumb__option">
+                        <a asp-action="Index" asp-controller="Home">Trang chủ</a>
+                        <span>@Model.Product.ProductName</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="product-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <div class="product__details__pic">
+                    <div class="product__details__pic__item">
+                        <img class="product__details__pic__item--large" id="main-product-image" data-base-url="~/img/"
+                        src="~/img/@Model.Product.Image" alt="@Model.Product.ProductName">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="product__details__text">
+                    <h3>@Model.Product.ProductName</h3>
+
+                    <div id="product-price" class="product__details__price">Vui lòng chọn phiên bản</div>
+
+                    <p>@Model.Product.ShortDescription</p>
+
+                    <div class="product__details__option">
+                        @if (Model.AvailableSizes.Any())
+                        {
+                            <div class="product__details__option__size">
+                                <span>Kích thước:</span>
+                                @foreach (var sizeName in Model.AvailableSizes)
+                                {
+                                    string sizeId = "size-" + sizeName;
+                                    <input type="radio" name="size" id="@sizeId" data-size="@sizeName">
+                                    <label for="@sizeId">@sizeName</label>
+                                }
+                            </div>
+                        }
+                        @if (Model.AvailableColors.Any())
+                        {
+                            <div class="product__details__option__color">
+                                <span>Màu sắc:   </span>
+                                @foreach (var colorName in Model.AvailableColors)
+                                {
+                                    string colorId = "color-" + colorName.Replace(" ", "-").ToLower();
+                                    <input type="radio" name="color" id="@colorId" data-color="@colorName">   
+                                    <label for="@colorId">@colorName</label>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <form asp-action="AddToCart" asp-controller="CartItem" method="post">
+                        <input type="hidden" id="selected-variant-id" name="productVariantId" value="" />
+
+                        <div class="product__details__quantity">
+                            <div class="quantity">
+                                <div class="pro-qty">
+                                    <input type="text" name="quantity" value="1">
+                                </div>
+                            </div>
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <button type="submit" id="add-to-cart-btn" class="primary-btn" disabled>THÊM VÀO GIỎ</button>
+                        }
+                        else
+                        {
+                            <a class="text-white primary-btn" href="javascript:void(0);" onclick="openLogin()">THÊM VÀO GIỎ</a>
+                        }
+
+
+                    </form>
+
+                    <ul>
+                        <li><b>Sẵn có</b> <span id="stock-quantity">Vui lòng chọn phiên bản</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="product__details__tab">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Mô tả chi tiết</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab"
+                            aria-selected="false">Đánh giá</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                            <div class="product__details__tab__desc">
+                                <h6>Thông tin sản phẩm</h6>
+                                <p>@Html.Raw(Model.Product.Description)</p>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tabs-2" role="tabpanel">
+                            <div class="product__details__tab__desc">
+                                <h6 class="mb-3">Đánh giá sản phẩm</h6>
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <form asp-action="AddReview" asp-controller="Product" method="post" class="mb-4">
+                                        <input type="hidden" name="productId" value="@Model.Product.ProductID" />
+
+                                        <div class="mb-3">
+                                            <select name="rating" class="form-select w-auto">
+                                                <option value="1">⭐ 1</option>
+                                                <option value="2">⭐⭐ 2</option>
+                                                <option value="3">⭐⭐⭐ 3</option>
+                                                <option value="4">⭐⭐⭐⭐ 4</option>
+                                                <option value="5">⭐⭐⭐⭐⭐ 5</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            <textarea name="comment" class="form-control" placeholder="Viết đánh giá..." style="height: 100px"></textarea>
+                                        </div>
+
+                                        <div class="d-flex">
+                                            <button type="submit" class="btn btn-primary ms-auto" style="margin-left: 1000px">
+                                                <i class="bi bi-send me-1"></i> Gửi đánh giá
+                                            </button>
+                                        </div>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        Vui lòng <a href="javascript:void(0);" onclick="openLogin()">Đăng nhập</a> để viết đánh giá.  
+                                    </div>
+                                }
+
+                                <h4 class="mt-4">Danh sách đánh giá</h4>
+                                @if (Model.ReviewProducts.Any())
+                                {
+                                    @foreach (var r in Model.ReviewProducts)
+                                    {
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6 class="card-title mb-1">
+                                                    <b>@r.User.UserName</b>
+                                                </h6>
+                                                <div class="mb-2 text-warning">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        if (i <= r.Rating)
+                                                        {
+                                                            <i class="bi bi-star-fill"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-star"></i>
+                                                        }
+                                                    }
+                                                </div>
+                                                <p class="card-text">@r.Content</p>
+                                                <small class="text-muted">@r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Product Section Begin -->
+<section class="related-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-title related__product__title">
+                    <h2>Sản phẩm liên quan</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            @foreach(var item in Model.RelatedProducts)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <a asp-action="Detail" asp-controller="Product" asp-route-id="@item.ProductID">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="/img/@item.Image">
+                            </div>
+                            <div class="product__item__text">
+                                <h6>@item.ProductName</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+    </div>
+</section>
+<!-- Related Product Section End -->
+@section Scripts {
+    <script>
+        @if (Model.Variants != null && Model.Variants.Any())
+        {
+            <text>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Tạo một bản sao "an toàn" của dữ liệu, chỉ chứa các trường cần thiết với tên viết thường
+                    // để tránh lỗi vòng lặp và lỗi phân biệt chữ hoa/thường.
+                    const variantsData = @Html.Raw(Json.Serialize(Model.Variants.Select(v => new
+                    {
+                        variantID = v.VariantID,
+                        productID = v.ProductID,
+                        color = v.Color,
+                        size = v.Size,
+                        price = v.Price,
+                        quantity = v.Quantity,
+                        image = v.Image
+                    })));
+
+                    const mainProductImageUrl = "@Model.Product.Image" || '/images/default-product.png';
+                    var imgSource = `/img/${mainProductImageUrl}`;
+
+                    const priceElement = document.getElementById('product-price');
+                    const stockElement = document.getElementById('stock-quantity');
+                    const addToCartBtn = document.getElementById('add-to-cart-btn');
+                    const hiddenVariantIdInput = document.getElementById('selected-variant-id');
+                    const mainImage = document.getElementById('main-product-image');
+                    const imageBaseUrl = document.getElementById('main-product-image').dataset.baseUrl;
+
+                    const colorRadios = document.querySelectorAll('input[name="color"]');
+                    const sizeRadios = document.querySelectorAll('input[name="size"]');
+                        // --- LOGIC MỚI ĐỂ BẬT/TẮT RADIO ---
+
+                    // Biến tạm để theo dõi lựa chọn hiện tại cho mỗi nhóm
+                    let activeColorRadio = document.querySelector('input[name="color"]:checked');
+                    let activeSizeRadio = document.querySelector('input[name="size"]:checked');
+
+                    colorRadios.forEach(radio => {
+                        radio.addEventListener('click', function() {
+                            // Nếu click vào nút đang được chọn
+                            if (this === activeColorRadio) {
+                                this.checked = false; // Bỏ chọn nó
+                                activeColorRadio = null; // Reset biến theo dõi
+                            } else {
+                                activeColorRadio = this; // Gán nút vừa click là nút đang hoạt động
+                            }
+                            // Luôn gọi updateState() để đồng bộ giao diện
+                            updateState();
+                        });
+                    });
+
+                    sizeRadios.forEach(radio => {
+                        radio.addEventListener('click', function() {
+                            // Logic tương tự cho nhóm size
+                            if (this === activeSizeRadio) {
+                                this.checked = false;
+                                activeSizeRadio = null;
+                            } else {
+                                activeSizeRadio = this;
+                            }
+                            updateState();
+                        });
+                    });
+                        
+
+                    function updateState() {
+                        const selectedColorInput = document.querySelector('input[name="color"]:checked');
+                        const selectedSizeInput = document.querySelector('input[name="size"]:checked');
+                        const selectedColor = selectedColorInput ? selectedColorInput.dataset.color : null;
+                        const selectedSize = selectedSizeInput ? selectedSizeInput.dataset.size : null;
+
+                        updateAvailableOptions(selectedColor, selectedSize);
+                        updateProductDetails(selectedColor, selectedSize);
+                    }
+
+                        function updateAvailableOptions(selectedColor, selectedSize) {
+                            // Bước 1: Tìm tất cả các size hợp lệ dựa trên màu đã chọn (nếu có)
+                            let availableSizes = new Set();
+                            if (selectedColor) {
+                                // Nếu đã chọn màu, chỉ lấy các size đi kèm với màu đó
+                                variantsData.filter(v => v.color === selectedColor).forEach(v => availableSizes.add(v.size));
+                            } else {
+                                // Nếu chưa chọn màu, tất cả các size đều là lựa chọn tiềm năng
+                                variantsData.forEach(v => availableSizes.add(v.size));
+                            }
+
+                            // Bước 2: Tìm tất cả các màu hợp lệ dựa trên size đã chọn (nếu có)
+                            let availableColors = new Set();
+                            if (selectedSize) {
+                                // Nếu đã chọn size, chỉ lấy các màu đi kèm với size đó
+                                variantsData.filter(v => v.size === selectedSize).forEach(v => availableColors.add(v.color));
+                            } else {
+                                // Nếu chưa chọn size, tất cả các màu đều là lựa chọn tiềm năng
+                                variantsData.forEach(v => availableColors.add(v.color));
+                            }
+
+                            // Bước 3: Cập nhật trạng thái cho các nút Size
+                            sizeRadios.forEach(radio => {
+                                const isAvailable = availableSizes.has(radio.dataset.size);
+                                radio.disabled = !isAvailable;
+                                radio.parentElement.classList.toggle('disabled', !isAvailable);
+                            });
+
+                            // Bước 4: Cập nhật trạng thái cho các nút Color
+                            colorRadios.forEach(radio => {
+                                const isAvailable = availableColors.has(radio.dataset.color);
+                                radio.disabled = !isAvailable;
+                                radio.parentElement.classList.toggle('disabled', !isAvailable);
+                            });
+                    }
+
+                    function updateProductDetails(selectedColor, selectedSize) {
+                        if (!selectedColor || !selectedSize) {
+                            priceElement.innerText = "Vui lòng chọn đầy đủ phiên bản";
+                            stockElement.innerText = "N/A";
+                            addToCartBtn.disabled = true;
+                            hiddenVariantIdInput.value = "";
+                            if(mainImage) mainImage.src =  imgSource;
+                            return;
+                        }
+
+                        const matchedVariant = variantsData.find(v => v.color === selectedColor && v.size === selectedSize);
+                        var imageSource = `/img/${matchedVariant.image}`;
+                        if (matchedVariant) {
+                            priceElement.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(matchedVariant.price);
+                            stockElement.innerText = `Còn ${matchedVariant.quantity} sản phẩm`;
+                            hiddenVariantIdInput.value = matchedVariant.variantID;
+                            if (addToCartBtn) addToCartBtn.disabled = matchedVariant.quantity == 0; 
+                            
+                            mainImage.src = `/img/${matchedVariant.image}`; 
+                        } else {
+                            priceElement.innerText = "Phiên bản không tồn tại";
+                            stockElement.innerText = "Hết hàng";
+                            addToCartBtn.disabled = true;
+                            hiddenVariantIdInput.value = "";
+                        }
+                    }
+
+                    colorRadios.forEach(radio => radio.addEventListener('change', updateState));
+                    sizeRadios.forEach(radio => radio.addEventListener('change', updateState));
+
+
+
+                    updateAvailableOptions(null, null);
+                });
+            </text>
+        }
+    </script>
+}

@@ -1,0 +1,315 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.ProductIndexViewModel
+
+@{
+    ViewData["Title"] = "Cửa hàng";
+}
+<section class="hero hero-normal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <vc:categories></vc:categories>
+            </div>
+            <div class="col-lg-9">
+                @Html.Partial("_SearchPartial")
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="User/img/breadcrumb.png">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>Cửa hàng Handmade</h2>
+                    <div class="breadcrumb__option">
+                        <a asp-action="Index" asp-controller="Home">Trang chủ</a>
+                        <span>Cửa hàng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+<!-- Product Section Begin -->
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+    var categories = ViewBag.Categories as List<PhamVanDai_Handmade.Models.CategoryModel>;
+}
+<form id="filter-form">
+    @Html.AntiForgeryToken()
+</form>
+<div class="container my-5">
+    <h2 class="text-center">Danh sách sản phẩm</h2>
+
+    <!-- Bộ lọc -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <select id="categoryFilter" class="form-select shadow-sm">
+                <option value="">-- Chọn danh mục --</option>
+                @foreach (var cat in categories)
+                {
+                    <option value="@cat.CategoryID">@cat.CategoryName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" id="colorFilter" class="form-control shadow-sm" placeholder="Màu sắc (vd: Đen)" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" id="sizeFilter" class="form-control shadow-sm" placeholder="Kích thước (vd: L)" />
+        </div>
+        <div class="col-md-3">
+            <select id="sortOrder" class="form-select shadow-sm">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Danh sách sản phẩm -->
+    <div class="row g-4 " id="productList"></div>
+
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination justify-content-center mt-4" id="pagination"></ul>
+    </nav>
+</div>
+
+@section Scripts {
+    <script>
+        // Tạo một biến global để lưu trạng thái đăng nhập
+        const isUserLoggedIn = @(User.Identity.IsAuthenticated ? "true" : "false");
+    </script>
+    <script>
+        let currentPage = 1;
+        const pageSize = 8;
+
+        function loadProducts(page = 1) {
+            let categoryId = $("#categoryFilter").val();
+            let color = $("#colorFilter").val();
+            let size = $("#sizeFilter").val();
+            let sortOrder = $("#sortOrder").val();
+
+            $.ajax({
+                url: '/Product/GetProducts',
+                type: 'GET',
+                data: { categoryId, color, size, sortOrder, page, pageSize },
+                success: function (res) {
+                    $("#productList").empty();
+                    if (res.products.length === 0) {
+                        $("#productList").append("<p class='text-center text-muted'>Không có sản phẩm nào.</p>");
+                    } 
+                    else
+                    {
+                        $.each(res.products, function (i, item) {
+                            
+                            // 1. Kiểm tra trạng thái yêu thích từ API
+                            const activeClass = item.isWishlisted ? 'active' : '';
+
+                            // 2. Tạo HTML cho icon trái tim
+                            const wishlistIconHtml = `
+                                <div class="product-card-hover">
+                                    <a href="#" class="wishlist-toggle ${activeClass}" data-product-id="${item.productID}">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
+                                </div>
+                            `;
+                            // --- KẾT THÚC BỔ SUNG ---
+
+                            // Sửa lại thẻ card để chứa icon trái tim
+                            $("#productList").append(`
+                                <div class="col-md-3 mt-4">
+                                    <div class="card product-card h-100">
+                                        <a href="/Product/Detail/${item.productID}" class="text-decoration-none text-dark">
+                                            <div class="position-relative">
+                                                <img src="/img/${item.image}" class="card-img-top" alt="${item.productName}">
+                                                ${wishlistIconHtml}
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="product-title">${item.productName}</h5>
+                                                <p class="product-category">Danh mục: ${item.categoryName}</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                    }
+                    // Render phân trang
+
+                    renderPagination(res.page, res.totalPages);
+                }
+            });
+        }
+
+        function renderPagination(page, totalPages) {
+            $("#pagination").empty();
+
+            if (totalPages <= 1) return;
+
+            let prevDisabled = (page === 1) ? "disabled" : "";
+            let nextDisabled = (page === totalPages) ? "disabled" : "";
+
+            $("#pagination").append(`
+                <li class="page-item ${prevDisabled}">
+                    <a class="page-link" href="#" onclick="changePage(${page - 1})">«</a>
+                </li>
+            `);
+
+            for (let i = 1; i <= totalPages; i++) {
+                let active = (i === page) ? "active" : "";
+                $("#pagination").append(`
+                    <li class="page-item ${active}">
+                        <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                    </li>
+                `);
+            }
+
+            $("#pagination").append(`
+                <li class="page-item ${nextDisabled}">
+                    <a class="page-link" href="#" onclick="changePage(${page + 1})">»</a>
+                </li>
+            `);
+        }
+
+        function changePage(page) {
+            if (page < 1) return;
+            currentPage = page;
+            loadProducts(page);
+        }
+
+        $(document).ready(function () {
+            loadProducts();
+
+            $("#categoryFilter, #colorFilter, #sizeFilter, #sortOrder").on("change keyup", function () {
+                currentPage = 1; // reset về trang 1 khi lọc
+                loadProducts();
+            });
+                // --- DÁN CODE MỚI VÀO ĐÂY ---
+                // sự kiện thêm xóa yêu thích
+            $('#productList').on('click', '.wishlist-toggle', function (e) {
+                // Ngăn không cho thẻ <a> nhảy lên đầu trang
+                e.preventDefault();
+                // Ngăn sự kiện click lan ra thẻ <a> cha (dẫn đến trang detail)
+                e.stopPropagation();
+                if (!isUserLoggedIn) {
+                    // Nếu người dùng chưa đăng nhập, mở popup đăng nhập và dừng lại
+                    if(typeof openLogin === "function") {
+                        openLogin();
+                    } else {
+                        alert('Vui lòng đăng nhập để sử dụng chức năng này.');
+                    }
+                    return; // Dừng, không gửi AJAX
+                }
+                var button = $(this);
+                var productId = button.data('product-id');
+                // Lấy token từ form filter bạn đã có
+                var token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '/WishlistItem/Toggle', // Gọi đến WishlistController
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        __RequestVerificationToken: token
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // response.added là true nếu vừa thêm, false nếu vừa xóa
+                            button.toggleClass('active', response.added);
+                            $('#wishlist-count').text(response.count);
+                        } else {
+                            alert(response.message || 'Vui lòng đăng nhập để sử dụng chức năng này.');
+                        }
+                    },
+                    error: function () {
+                        alert('Đã có lỗi xảy ra khi xử lý yêu thích.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+@section Styles {
+    <style>
+        /* Card sản phẩm */
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            }
+
+            .product-card img {
+                height: 220px;
+                object-fit: cover;
+            }
+
+            .product-card .card-body {
+                padding: 15px;
+            }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-category {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .product-variants {
+            font-size: 0.85rem;
+            padding-left: 18px;
+            color: #495057;
+        }
+
+        .product-card {
+            position: relative; /* Cần thiết để định vị icon */
+        }
+
+        .product-card-hover {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            opacity: 0; /* Ẩn đi mặc định */
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-card-hover {
+            opacity: 1; /* Hiện ra khi di chuột */
+        }
+
+        .wishlist-toggle i {
+            color: #6c757d;
+            font-size: 20px;
+            background-color: white;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .wishlist-toggle.active i {
+            color: red;
+        }
+    </style>
+}
+
+
+
+
+
+<!-- Product Section End -->

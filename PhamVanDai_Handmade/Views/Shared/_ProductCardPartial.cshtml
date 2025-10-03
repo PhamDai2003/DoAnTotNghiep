@@ -1,0 +1,25 @@
+﻿@model PhamVanDai_Handmade.Models.ProductModel
+
+@{
+    var wishlistedIds = ViewData["WishlistedIds"] as List<int> ?? new List<int>();
+    var activeClass = wishlistedIds.Contains(Model.ProductID) ? "active" : "";
+}
+
+
+    <div class="card product-card h-100">
+        <div class="position-relative">
+            <a href="/Product/Detail/@Model.ProductID" class="text-decoration-none text-dark">
+                <img src="/img/@Model.Image" class="card-img-top" alt="@Model.Image">
+            </a>
+                <div class="product-card-hover">
+                    <a href="#" class="wishlist-toggle @activeClass" data-product-id="@Model.ProductID"><i class="fa fa-heart"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="product-title">@Model.ProductName</h5>
+                <p class="product-category">Danh mục: @Model.Category.CategoryName</p>
+
+        </div>
+    </div>
+
+

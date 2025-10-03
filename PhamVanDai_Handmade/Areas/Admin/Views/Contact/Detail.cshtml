@@ -1,0 +1,70 @@
+﻿@model PhamVanDai_Handmade.Models.ContactModel
+
+@{
+    ViewData["Title"] = "Chi tiết liên hệ";
+}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Chi tiết liên hệ</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Thông tin tin nhắn</h5>
+
+                        <dl class="row">
+                            <dt class="col-sm-3">Người gửi</dt>
+                            <dd class="col-sm-9">@Model.User?.UserName</dd>
+
+                            <dt class="col-sm-3">Email</dt>
+                            <dd class="col-sm-9">@Model.User?.Email</dd>
+
+                            <dt class="col-sm-3">Số điện thoại</dt>
+                            <dd class="col-sm-9">@Model.User?.PhoneNumber</dd>
+
+                            <dt class="col-sm-3">Ngày gửi</dt>
+                            <dd class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                            <dt class="col-sm-3">Trạng thái</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge @(Model.Status == 0 ? "bg-secondary" : "bg-success")">
+                                    @(Model.Status == 0 ? "Chưa đọc" : "Đã đọc")
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-3">Nội dung</dt>
+                            <dd class="col-sm-9">
+                                <div class="p-3 border rounded bg-light">
+                                    @Model.Message
+                                </div>
+                            </dd>
+                        </dl>
+
+                        <div class="mt-3">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                            </a>
+
+                            <form asp-action="Delete" asp-route-id="@Model.ContactID" method="post"
+                                  onsubmit="return confirm('Bạn chắc chắn muốn xóa tin nhắn này?');"
+                                  style="display:inline;">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->

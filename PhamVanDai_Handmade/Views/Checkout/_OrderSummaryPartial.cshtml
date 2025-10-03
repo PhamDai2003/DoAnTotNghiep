@@ -1,0 +1,27 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.CheckoutViewModel
+
+<h4>Đơn hàng của bạn</h4>
+<ul>
+    @foreach (var item in Model.CartItems)
+    {
+        <li>@item.ProductName <small>@item.Color / @item.Size</small> <span>@item.Total.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></li>
+    }
+</ul>
+<div class="checkout__order__subtotal">Tạm tính: <span>@Model.SubTotal.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></div>
+<div class="checkout__order__shipping">Phí ship: <span id="shipping-fee-display">@Model.ShippingFee.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></div>
+<div class="checkout__order__discount">Giảm giá: <span id="discount-display">- @Model.Discount.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></div>
+<div class="checkout__order__total">Tổng cộng: <span id="final-total-display">@Model.FinalTotal.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></div>
+
+<h5>Phương thức thanh toán</h5>
+<label><input type="radio" name="PaymentMethod" value="COD" checked /> Thanh toán khi nhận hàng</label>
+<br />
+<label><input type="radio" name="PaymentMethod" value="PAYOS" /> Thanh toán qua PAYOS</label>
+
+<!-- Các hidden input để truyền dữ liệu khi submit -->
+<input type="hidden" asp-for="CouponId" value="@Model.CouponId" />
+<input type="hidden" asp-for="SubTotal" value="@Model.SubTotal" />
+<input type="hidden" asp-for="ShippingFee" value="@Model.ShippingFee" />
+<input type="hidden" asp-for="Discount" value="@Model.Discount" />
+<input type="hidden" asp-for="FinalTotal" value="@Model.FinalTotal" />
+<input type="hidden" asp-for="checkCal" value="@Model.checkCal" />
+<button type="submit" name="action" value="order" class="site-btn w-100 mt-3">Đặt hàng</button>

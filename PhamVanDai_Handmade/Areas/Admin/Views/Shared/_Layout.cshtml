@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/style.css">
+    <!-- Favicons -->
+    <link href="~/img/favicon.png" rel="icon">
+    <link href="~/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- ~/~/vendor CSS Files -->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="~/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="~/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="~/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="~/fonts/fontawesome-free-6.1.2-web/css/all.min.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="~/css/style.css" rel="stylesheet">
+    <title>AdminCp</title>
+
+</head>
+<body>
+    
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="" class="logo d-flex align-items-center">
+                <img style="width: 25px; height: 25px" src="~/img/logo.png" alt="">
+                <span class="d-none d-lg-block">ADMIN</span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo -->
+
+        
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link nav-icon search-bar-toggle " href="#">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li>
+                <!-- End Search Icon-->
+                <li class="nav-item dropdown pe-3">
+
+                    <a asp-action="Logout" asp-controller="Account" class="nav-link nav-profile d-flex align-items-center pe-0" >
+
+                        <span>Đăng xuất </span>
+                        &nbsp
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Dashboard">
+                    <i class="fas fa-chart-line dashboard-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Product">
+                    <i class="bi bi-grid"></i>
+                    <span>Quản lý sản phẩm</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Category">
+                    <i class="bi bi-list"></i>
+                    <span>Quản lý danh mục</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="User">
+                    <i class="bi bi-person-fill"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Coupon">
+                    <i class="bi bi-tag"></i>
+                    <span>Quản lý phiếu giảm giá</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Contact">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>Quản lý liên hệ</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Order">
+                    <i class="bi bi-cart-fill"></i>
+                    <span>Quản lý đơn hàng</span>
+                </a>
+            </li>
+        </ul>
+
+    </aside><!-- End Sidebar-->
+   
+
+    <div class="clear"></div>
+    <div class="main">
+        @RenderBody()
+    </div>
+
+    <!-- SweetAlert2 -->
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+
+
+    <!-- Notification Partial -->
+    @Html.Partial("_NotificationPartial")
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+
+
+</body>
+</html>
+
+
+<!-- Vendor JS Files -->
+<script src="~/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="~/vendor/chart.js/chart.umd.js"></script>
+<script src="~/vendor/echarts/echarts.min.js"></script>
+<script src="~/vendor/quill/quill.js"></script>
+<script src="~/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="~/vendor/tinymce/tinymce.min.js"></script>
+<script src="~/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="~/js/main.js"></script>
+

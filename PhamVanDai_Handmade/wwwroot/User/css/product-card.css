@@ -1,0 +1,67 @@
+﻿ .product-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            }
+
+            .product-card img {
+                height: 220px;
+                object-fit: cover;
+            }
+
+            .product-card .card-body {
+                padding: 15px;
+            }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-category {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .product-variants {
+            font-size: 0.85rem;
+            padding-left: 18px;
+            color: #495057;
+        }
+
+        .product-card {
+            position: relative; /* Cần thiết để định vị icon */
+        }
+
+        .product-card-hover {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            opacity: 0; /* Ẩn đi mặc định */
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-card-hover {
+            opacity: 1; /* Hiện ra khi di chuột */
+        }
+
+        .wishlist-toggle i {
+            color: #6c757d;
+            font-size: 20px;
+            background-color: white;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .wishlist-toggle.active i {
+            color: red;
+        }

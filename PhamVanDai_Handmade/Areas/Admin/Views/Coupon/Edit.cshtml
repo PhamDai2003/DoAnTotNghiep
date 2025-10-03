@@ -1,0 +1,118 @@
+﻿@model PhamVanDai_Handmade.Models.CouponModel
+
+@{
+    ViewData["Title"] = "Edit Coupon";
+}
+
+<style>
+    img {
+        width: 100%;
+    }
+</style>
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Quản lý mã giảm giá</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sửa mã giảm giá</h5>
+
+                        <!-- Form -->
+                        <form method="POST" asp-action="Edit">
+                            <input type="hidden" asp-for="CouponID" />
+
+                            <div class="row mb-3">
+                                <label asp-for="Code" class="col-sm-3 col-form-label">Mã code</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Code" class="form-control" />
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="Description" class="col-sm-3 col-form-label">Mô tả</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Description" class="form-control" />
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="DiscountAmount" class="col-sm-3 col-form-label">Số tiền giảm</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="DiscountAmount" type="number" step="1000" class="form-control" />
+                                    <span asp-validation-for="DiscountAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="MinOrderValue" class="col-sm-3 col-form-label">Giá trị tối thiểu</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="MinOrderValue" type="number" step="1000" class="form-control" />
+                                    <span asp-validation-for="MinOrderValue" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="quantity" class="col-sm-3 col-form-label">Số lượng</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="quantity" type="number" class="form-control" />
+                                    <span asp-validation-for="quantity" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="StartDate" class="col-sm-3 col-form-label">Ngày bắt đầu</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="StartDate" type="date" class="form-control" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="EndDate" class="col-sm-3 col-form-label">Ngày hết hạn</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="EndDate" type="date" class="form-control" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="status" class="col-sm-3 col-form-label">Trạng thái</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="status" class="form-control">
+                                        <option value="1" >Hoạt động</option>
+                                        <option value="2" >Ẩn</option>
+                                    </select>
+                                    <span asp-validation-for="status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-sm-9">
+                                    <input type="submit" value="Lưu" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </form><!-- End Form -->
+
+                        <div>
+                            <a asp-action="Index" asp-controller="Coupon" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

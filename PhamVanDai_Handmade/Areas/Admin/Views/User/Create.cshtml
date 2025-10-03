@@ -1,0 +1,108 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.UserFormViewModel
+
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý tài khoản</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Thêm tài khoản</h5>
+
+                        <!-- General Form Elements -->
+                        <form method="POST" asp-action="Create">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+
+                            <div class="row mb-4">
+                                <label asp-for="UserName" class="col-sm-3 col-form-label">Tên tài khoản</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="UserName" class="form-control" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Email" type="email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="PhoneNumber" class="col-sm-3 col-form-label">Số điện thoại</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="PhoneNumber" class="form-control" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="Password" class="col-sm-3 col-form-label">Mật khẩu</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Password" type="password" class="form-control" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="ConfirmPassword" class="col-sm-3 col-form-label">Xác nhận mật khẩu</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="RoleId" class="col-sm-3 col-form-label">Quyền</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="RoleId" class="form-control"
+                                            asp-items="@(new SelectList(ViewBag.Roles, "Id", "Name"))">
+                                        <option value="">-- Chọn quyền --</option>
+                                    </select>
+                                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label asp-for="Status" class="col-sm-3 col-form-label">Trạng thái</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="Status" class="form-control">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Khóa</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-sm-9">
+                                    <input type="submit" value="Thêm tài khoản" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </form><!-- End General Form Elements -->
+
+                        <div>
+                            <a asp-action="Index" asp-controller="User" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

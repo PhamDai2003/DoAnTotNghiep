@@ -1,0 +1,226 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.CheckoutViewModel
+@{
+    var index = 0;
+    var deleteForms = new List<int>();
+}
+<style>
+    .address-item {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+        .address-item input[type="radio"] {
+            display: none;
+        }
+
+        .address-item:has(input:checked) {
+            border-color: #007bff;
+            background: #e9f3ff;
+        }
+</style>
+
+<section class="breadcrumb-section set-bg" data-setbg="/User/img/breadcrumb.png">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>Đặt hàng</h2>
+                    <div class="breadcrumb__option">
+                        <a asp-action="Index" asp-controller="Home">Trang chủ</a>
+                        <span>Đặt hàng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="checkout spad">
+    <div class="container">
+        <!-- ✅ Form đặt hàng -->
+        <form id="checkout-form" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-lg-8" style="background-color: #F5F5F5">
+                    <h4 class="pt-4" style="font-weight: 700">Thông tin giao hàng</h4>
+                    <div class="address-list mb-4">
+                        <a asp-action="Create" asp-controller="Address" class="btn btn-sm btn-primary my-3">Thêm mới</a>
+
+                        <h5>Chọn địa chỉ đã lưu:</h5>
+                        @{
+                            var index = 0;
+                        }
+                        @foreach (var address in Model.SavedAddresses)
+                        {
+                            if (!address.IsDeteted)
+                            {
+                                <div class="address-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <input class="form-check-input address-radio me-2"
+                                               type="radio"
+                                               name="SelectedAddressId"
+                                               id="address-@address.AddressID"
+                                               value="@address.AddressID"
+                                        @(index == 0 ? "checked" : "") />
+
+                                        <label for="address-@address.AddressID" class="form-check-label">
+                                            <strong>@address.FullName</strong> - @address.PhoneNumber <br />
+                                            @address.Address
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <a asp-action="Edit"
+                                           asp-controller="Address"
+                                           asp-route-id="@address.AddressID"
+                                           class="btn btn-sm btn-warning me-1">Sửa</a>
+
+                                        <!-- Nút Xóa: không phải form, chỉ liên kết tới form bên dưới bằng form="..." -->
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                form="delete-form-@address.AddressID"
+                                                onclick="return confirm('Xác nhận xóa địa chỉ?')">
+                                            Xóa
+                                        </button>
+                                    </div>
+                                </div>
+                                index++;
+                                @* lưu id để tạo form Delete ngoài form checkout *@
+                                deleteForms.Add(address.AddressID); index++; 
+                            }
+                        }
+                    </div>
+
+                    <div class="checkout__input">
+                        <p>Mã giảm giá</p>
+                        <div class="input-group">
+                            <input type="text"
+                                   id="coupon-code-input"
+                                   name="couponCode"
+                                   class="form-control"
+                                   placeholder="Nhập mã giảm giá" />
+                            <button type="button" id="apply-coupon-btn" class="site-btn">Áp dụng</button>
+                        </div>
+                        <div id="coupon-message" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div id="order-summary-container" class="checkout__order">
+                        @await Html.PartialAsync("_OrderSummaryPartial", Model)
+                    </div>
+                </div>
+            </div>
+        </form>
+        @* --- TẠO CÁC FORM DELETE BÊN NGOÀI (không bị lồng) --- *@
+        @foreach (var id in deleteForms)
+        {
+            <form id="delete-form-@id"
+                  asp-action="Delete"
+                  asp-controller="Address"
+                  asp-route-id="@id"
+                  method="post"
+                  style="display:none">
+                @Html.AntiForgeryToken()
+            </form>
+        }
+    </div>
+</section>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const form = $('#checkout-form');
+            const orderSummaryContainer = $('#order-summary-container');
+            
+
+                // --- SỰ KIỆN 1: TỰ ĐỘNG TÍNH PHÍ  ---
+            const couponMessageDiv = $('#coupon-message');
+
+            // --- HÀM AJAX TÍNH TOÁN TỔNG THỂ ---
+            function updateTotals() {
+                $.ajax({
+                    url: '@Url.Action("UpdateTotals", "Checkout")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        couponMessageDiv.text('').removeClass('text-danger text-success');
+                        if (response.success) {
+                            orderSummaryContainer.html(response.html);
+                            // Nếu có áp dụng coupon thành công, hiển thị thông báo
+                            if ($('input[name="couponCode"]').val()) {
+                                couponMessageDiv.css('color', 'green').text('Áp dụng mã thành công!');
+                            }
+                        } else {
+                            orderSummaryContainer.html(response.html);
+                            couponMessageDiv.css('color', 'red').text(response.message);
+                        }
+                    },
+                    error: function() { alert('Lỗi kết nối.'); }
+                });
+            }
+
+            // --- GẮN SỰ KIỆN ---
+            // Gọi updateTotal() cho radio đã check sẵn
+            let checkedRadio = document.querySelector(".address-radio:checked");
+            if (checkedRadio) {
+                updateTotals();
+            }
+            // 1. Khi chọn địa chỉ
+            $('.address-radio').on('change', updateTotals);    
+            
+            // 2. Khi bấm nút Áp dụng coupon
+            $('#apply-coupon-btn').on('click', updateTotals);
+            // 3. Khi bấm nút Đặt hàng (submit form)
+            
+
+
+
+            // --- XỬ LÝ SỰ KIỆN ĐẶT HÀNG (ĐÃ SỬA LẠI) ---
+            // Dùng event delegation để lắng nghe sự kiện CLICK trên nút "Đặt hàng"
+            // Nút này có thể được tải lại cùng với partial view
+            orderSummaryContainer.on('click', 'button[value="order"]', function(e) {
+                e.preventDefault(); // Ngăn hành vi submit mặc định của nút
+
+                // Lấy tất cả dữ liệu từ form chính
+                // bao gồm địa chỉ, sđt, coupon...
+                var formData = form.serialize();
+
+                // Lấy phương thức thanh toán được chọn
+                var paymentMethod = orderSummaryContainer.find('input[name="PaymentMethod"]:checked').val();
+                formData += '&PaymentMethod=' + paymentMethod;
+
+                // Vô hiệu hóa nút để tránh click nhiều lần
+                $(this).prop('disabled', true).text('Đang xử lý...');
+
+                $.ajax({
+                    url: '@Url.Action("PlaceOrder", "Checkout")',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.isRedirect) {
+                                window.location.href = response.redirectUrl; // PayOS
+                            } else {
+                                window.location.href = response.redirectUrl; // COD
+                            }
+                        } else {
+                            alert(response.message || 'Lỗi khi đặt hàng.');
+                            // Kích hoạt lại nút nếu có lỗi
+                            orderSummaryContainer.find('button[value="order"]').prop('disabled', false).text('Đặt hàng');
+                        }
+                    },
+                    error: function() {
+                        alert('Lỗi không thể gửi yêu cầu đặt hàng.');
+                        orderSummaryContainer.find('button[value="order"]').prop('disabled', false).text('Đặt hàng');
+                    }
+                });
+            });
+        });
+    </script>
+}

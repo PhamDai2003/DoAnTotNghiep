@@ -1,0 +1,82 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.UserEditViewModel
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý tài khoản</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sửa tài khoản</h5>
+
+                        <form asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="Id" />
+
+                            <div asp-validation-summary="All" class="text-danger"></div>
+
+                            <div class="row mb-3">
+                                <label asp-for="UserName" class="col-sm-3 col-form-label">Tên tài khoản</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="UserName" class="form-control" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="PhoneNumber" class="col-sm-3 col-form-label">Số điện thoại</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="PhoneNumber" class="form-control" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="RoleId" class="col-sm-3 col-form-label">Quyền</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="RoleId" class="form-control"
+                                            asp-items="@(new SelectList(ViewBag.Roles, "Id", "Name", Model.RoleId))">
+                                        <option value="">-- Chọn quyền --</option>
+                                    </select>
+                                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="Status" class="col-sm-3 col-form-label">Trạng thái</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="Status" class="form-control">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="2">Khóa</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-sm-9">
+                                    <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </form>
+                        <div>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

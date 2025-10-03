@@ -1,0 +1,89 @@
+﻿@model IEnumerable<PhamVanDai_Handmade.Models.CategoryModel>
+
+@{
+    ViewData["Title"] = "Trash";
+}
+
+<main id="main" class="main">
+
+
+    <div class="pagetitle">
+        <h1>Quản lý danh mục</h1>
+    </div><!-- End Page Title -->
+
+    <div class="mb-3">
+        <a asp-action="Index" asp-controller="Category" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Danh sách danh mục đã xóa</h5>
+                        <!-- Table with stripped rows -->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tên danh mục</th>
+                                    <th>Slug</th>
+                                    <th>Mô tả</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CategoryName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Slug)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Description)
+                                        </td>
+                                        <td>
+                                            <span class="badge @(item.Status == 1 ? "bg-success" : "bg-secondary")">
+                                                @(item.Status == 1 ? "Hiển thị" : "Ẩn")
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            <form asp-action="Restore" asp-controller="Category" asp-route-id="@item.CategoryID" method="post"
+                                                  onsubmit="return confirm('Bạn chắc chắn muốn khôi phục danh mục này?');"
+                                                  style="display:inline;">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fa fa-undo"></i> Khôi phục
+                                                </button>
+                                            </form>
+                                            |
+                                            <form asp-action="DeletePermen" asp-controller="Category" asp-route-id="@item.CategoryID" method="post"
+                                                  onsubmit="return confirm('Bạn chắc chắn muốn xóa danh mục này?');"
+                                                  style="display:inline;">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Xóa vĩnh viễn
+                                                </button>
+                                            </form>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+

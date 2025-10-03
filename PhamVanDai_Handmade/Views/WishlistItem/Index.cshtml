@@ -1,0 +1,189 @@
+﻿@model IEnumerable<PhamVanDai_Handmade.Models.WishlistItemModel>
+
+@{
+    ViewData["Title"] = "Danh sách yêu thích";
+}
+<!-- Hero Section Begin -->
+<section class="hero hero-normal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <!--categories-->
+                <vc:categories></vc:categories>
+            </div>
+            <div class="col-lg-9">
+                @Html.Partial("_SearchPartial")
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="breadcrumb-section set-bg" data-setbg="/User/img/breadcrumb.png">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>Danh sách yêu thích</h2>
+                    <div class="breadcrumb__option">
+                        <a asp-action="Index" asp-controller="Home">Trang chủ</a>
+                        <span>Yêu thích</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<form id="filter-form">
+    @Html.AntiForgeryToken()
+</form>
+<section class="product spad">
+    <div class="container">
+        @if (Model.Any())
+        {
+            <div class="row" id="results-grid">
+                @{
+                    // Tạo một danh sách chỉ chứa ID các sản phẩm đã thích
+                    // Để Partial View biết và tô màu đỏ cho tất cả các trái tim
+                    var wishlistedIds = Model.Select(i => i.ProductID).ToList();
+                    ViewData["WishlistedIds"] = wishlistedIds;
+                }
+
+                @foreach (var item in Model)
+                {
+                    // Tái sử dụng Partial View để hiển thị thẻ sản phẩm
+                    // Truyền vào đối tượng Product và ViewData chứa danh sách ID
+                    <div class="col-md-3 mt-4">
+                        @await Html.PartialAsync("_ProductCardPartial", item.Product, ViewData)
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <h4>Danh sách yêu thích của bạn đang trống!</h4>
+                <p>Hãy khám phá thêm nhiều sản phẩm và thêm vào đây nhé.</p>
+                <a asp-action="Index" asp-controller="Product" class="primary-btn mt-3">Bắt đầu mua sắm</a>
+            </div>
+        }
+    </div>
+</section>
+@* Đừng quên thêm Section Scripts nếu bạn cần JavaScript cho Wishlist AJAX *@
+@section Scripts {
+    <script>
+        // Tạo biến global để script có thể kiểm tra
+        const isUserLoggedIn = @(User.Identity.IsAuthenticated ? "true" : "false");
+    </script>
+    <script>
+        const resultsGrid = $('#results-grid');
+        // Copy code JavaScript xử lý sự kiện click cho wishlist vào đây
+        // Xử lý sự kiện click vào nút yêu thích
+            resultsGrid.on('click', '.wishlist-toggle', function (e) {
+                e.preventDefault(); // Ngăn hành vi mặc định của thẻ <a>
+
+                // Kiểm tra xem người dùng đã đăng nhập chưa
+                if (!isUserLoggedIn) {
+                    // Mở popup đăng nhập nếu có, hoặc báo lỗi
+                    alert('Vui lòng đăng nhập để sử dụng chức năng này.');
+                    return; // Dừng lại
+                }
+
+                var button = $(this);
+                var productId = button.data('product-id');
+                var token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '/WishlistItem/Toggle', // Gọi đến WishlistController
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        __RequestVerificationToken: token
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Tự động thêm/xóa class "active"
+                            button.toggleClass('active', response.added);
+                            $('#wishlist-count').text(response.count);
+                        } else {
+                            alert(response.message || 'Có lỗi xảy ra.');
+                        }
+                    },
+                    error: function () {
+                        alert('Đã có lỗi xảy ra khi xử lý yêu thích.');
+                    }
+                });
+            });
+    </script>
+}
+@section Styles {
+    <style>
+        /* Card sản phẩm */
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            }
+
+            .product-card img {
+                height: 220px;
+                object-fit: cover;
+            }
+
+            .product-card .card-body {
+                padding: 15px;
+            }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-category {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .product-variants {
+            font-size: 0.85rem;
+            padding-left: 18px;
+            color: #495057;
+        }
+
+        .product-card {
+            position: relative; /* Cần thiết để định vị icon */
+        }
+
+        .product-card-hover {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            opacity: 0; /* Ẩn đi mặc định */
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-card-hover {
+            opacity: 1; /* Hiện ra khi di chuột */
+        }
+
+        .wishlist-toggle i {
+            color: #6c757d;
+            font-size: 20px;
+            background-color: white;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .wishlist-toggle.active i {
+            color: red;
+        }
+    </style>
+}

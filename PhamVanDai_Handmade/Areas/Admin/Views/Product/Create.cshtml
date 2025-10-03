@@ -1,0 +1,214 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.ProductFormViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<style>
+    img {
+        width: 100%;
+    }
+</style>
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Quản lý sản phẩm</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Thêm sản phẩm</h5>
+
+                        <!-- General Form Elements -->
+                        <form method="POST" asp-action="Create" enctype="multipart/form-data">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="row mb-4">
+                                <label asp-for="Product.ProductName" class="col-sm-3 col-form-label">Tên sản phẩm*</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Product.ProductName" class="form-control">
+                                    <span asp-validation-for="Product.ProductName" class="text-danger" />
+
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <label asp-for="Product.ShortDescription" class="col-sm-3 col-form-label">Mô tả</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Product.ShortDescription" class="form-control">
+                                    <span asp-validation-for="Product.ShortDescription" class="text-danger" />
+
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <label asp-for="Product.Description" class="col-sm-3 col-form-label">Mô tả chi tiết</label>
+                                <div class="col-sm-9">
+                                    <textarea asp-for="Product.Description" rows="10" class="form-control"></textarea>
+                                    <span asp-validation-for="Product.Description" class="text-danger" />
+
+                                </div>
+                            </div>
+                              
+                            <div class="row mb-4"> 
+                                <label asp-for="ImageUpload" class="col-sm-3 col-form-label">Hình ảnh</label> 
+                                <div class="col-sm-9"> 
+                                   <!-- Vùng hiển thị preview --> 
+                                     <div class="mb-2"> 
+                                        <img id="previewImage" src="~/img/@Model.Product.Image" alt="Ảnh sản phẩm"
+                                             style="max-width:150px; border:1px solid #ccc; padding:3px;" /> 
+                                     </div> 
+                                     <!--Input chọn file-->
+                                    <input asp-for="ImageUpload" class="form-control" type="file" onchange="previewNewImage(event)">
+                                    <span asp-validation-for="Product.ImageUpload" class="text-danger" />
+                                </div>
+                             </div>
+                            <div class="row mb-4">
+                                <label asp-for="Product.CategoryID" class="col-sm-3 col-form-label">Danh mục</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="Product.CategoryID" class="form-control" asp-items="ViewBag.CategoryID">
+                                        <option value="">--Choose Category--</option>
+                                    </select>
+                                    <span asp-validation-for="Product.CategoryID" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <h4>Các biến thể sản phẩm</h4>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Màu sắc</th>
+                                        <th>Kích thước</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng tồn kho</th>
+                                        <th>Chọn ảnh</th>
+                                        <th width ="150px"> Hình ảnh</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="variants-container">
+                                </tbody>
+                            </table>
+                            <button type="button" id="add-variant-btn" class="btn btn-secondary">Thêm biến thể</button>
+
+                            <hr />
+
+                            <template id="variant-template">
+                                <tr>
+                                    <td>
+                                        <input type="text" name="Variants[__prefix__].Color" class="form-control" placeholder="Màu sắc" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Variants[__prefix__].Size" class="form-control" placeholder="Kích thước" />
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Variants[__prefix__].Price" class="form-control" placeholder="Giá" />
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Variants[__prefix__].Quantity" class="form-control" placeholder="Tồn kho" />
+                                    </td>
+                                    <!-- Cột chọn file ảnh -->
+                                    <td>
+                                        <input type="file" name="Variants[__prefix__].ImageUpload"
+                                               class="form-control variant-image" accept="image/*" />
+                                    </td>
+                                    <!-- Cột hiển thị preview -->
+                                    <td>
+                                        <img class="variant-preview" style="max-width:150px; display:none; border:1px solid #ccc; padding:2px;" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-variant-btn">Xóa</button>
+                                    </td>
+                                </tr>
+                            </template>
+
+
+                            <div class="row mb-4">
+
+                                <div class="col-sm-9">
+                                    <input type="submit" value="Thêm sản phẩm" class="btn btn-primary" />
+                                </div>
+                            </div>
+
+                        </form><!-- End General Form Elements -->
+                        <div>
+                            <a asp-action="Index" asp-controller="Product" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+<script>
+    function previewNewImage(event) {
+        const preview = document.getElementById('previewImage');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                // Gán ảnh mới vào thẻ <img>
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+<partial name="_ValidationScriptsPartial" />
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addVariantBtn = document.getElementById('add-variant-btn');
+        const variantsContainer = document.getElementById('variants-container');
+        const variantTemplate = document.getElementById('variant-template');
+        let variantIndex = 0;
+
+        addVariantBtn.addEventListener('click', function () {
+            // Lấy HTML từ template
+            const templateContent = variantTemplate.innerHTML;
+            // Thay thế __prefix__ bằng chỉ số hiện tại
+            const newRowHtml = templateContent.replace(/__prefix__/g, variantIndex);
+
+            // Thêm dòng mới vào table body
+            variantsContainer.insertAdjacentHTML('beforeend', newRowHtml);
+            variantIndex++;
+        });
+
+        // Xử lý sự kiện xóa một dòng biến thể
+        variantsContainer.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('remove-variant-btn')) {
+                // Tìm đến thẻ <tr> cha và xóa nó
+                e.target.closest('tr').remove();
+            }
+        });
+        // Preview ảnh cho từng biến thể
+        variantsContainer.addEventListener('change', function (e) {
+            if (e.target && e.target.classList.contains('variant-image')) {
+                const fileInput = e.target;
+                const previewImg = fileInput.closest('tr').querySelector('.variant-preview');
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        previewImg.src = ev.target.result;
+                        previewImg.style.display = "block";
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    previewImg.style.display = "none";
+                    previewImg.src = "";
+                }
+            }
+        });
+    });
+</script>
+@section Scripts {
+    @{
+        
+        
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

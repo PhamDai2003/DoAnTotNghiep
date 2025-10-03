@@ -1,0 +1,182 @@
+﻿@using X.PagedList.Mvc.Core
+
+@model X.PagedList.IPagedList<PhamVanDai_Handmade.Models.OrderModel>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý đơn hàng</h1>
+    </div>
+
+    <!-- Bộ lọc -->
+    <section class="section mb-3">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Index" asp-controller="Order" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Mã đơn hàng</label>
+                        <input type="text" name="orderId" class="form-control" value="" placeholder="Nhập mã...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Tên khách hàng</label>
+                        <input type="text" name="userName" class="form-control" value="" placeholder="Nhập tên...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Trạng thái đơn hàng</label>
+                        <select name="status" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="0">Chờ xử lý</option>
+                            <option value="1">Đã xác nhận</option>
+                            <option value="2">Đang giao</option>
+                            <option value="3">Hoàn thành</option>
+                            <option value="4">Hoàn trả</option>
+                            <option value="5">Đã hủy</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Thanh toán</label>
+                        <select name="paymentStatus" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="1">Chưa thanh toán</option>
+                            <option value="2">Đã thanh toán</option>
+                            <option value="3">Đã hoàn tiền</option>
+                            <option value="0">Thất bại</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Ngày đặt</label>
+                        <input type="date" name="orderDate" class="form-control" value=""> 
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Danh sách đơn hàng -->
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Danh sách đơn hàng</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Email</th>
+                            <th>Ngày đặt</th>
+                            <th>Thanh toán</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td>@order.OrderID</td>
+                                <td>@order.DeliveryAddress?.User?.UserName</td>
+                                <td>@order.DeliveryAddress?.User?.Email</td>
+                                <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge @(order.PaymentStatus == 2 ? "bg-success" : order.PaymentStatus == 1 ? "bg-warning" : order.PaymentStatus == 3 ? "bg-success" : "bg-danger")">
+                                        @(order.PaymentStatus == 1 ? "Chưa thanh toán" :
+                                                 order.PaymentStatus == 2 ? "Đã thanh toán" :
+                                                 order.PaymentStatus == 3 ? "Đã hoàn tiền" :
+                                                 order.PaymentStatus == 0 ? "Thất bại" : "Chờ xác nhận")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge
+                                        @(order.Status == 0 ? "bg-secondary" :
+                                          order.Status == 1 ? "bg-info" :
+                                          order.Status == 2 ? "bg-primary" :
+                                          order.Status == 3 ? "bg-success" :
+                                          order.Status == 4 ? "bg-warning" : "bg-danger")">
+                                        @(order.Status == 0 ? "Chờ xử lý" :
+                                                        order.Status == 1 ? "Đã xác nhận" :
+                                                        order.Status == 2 ? "Đang giao" :
+                                                        order.Status == 3 ? "Hoàn thành" :
+                                                        order.Status == 4 ? "Hoàn trả" : "Đã hủy")
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-action="Detail" asp-route-id="@order.OrderID" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Xem
+                                    </a>
+
+                                    @if (order.Status >= 0 && order.Status <= 3)
+                                    {
+                                        <form asp-action="UpdateStatus" asp-route-id="@order.OrderID" method="post" style="display:inline"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này?');">
+                                            <button type="submit" class="btn btn-sm @(order.Status == 3 ? "btn-warning" : "btn-success") ">
+                                                @(order.Status == 0 ? "Xác nhận" :
+                                                                order.Status == 1 ? "Giao hàng" :
+                                                                order.Status == 2 ? "Hoàn thành" :
+                                                                order.Status == 3 ? "Hoàn trả" : "")
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- Nút cập nhật trạng thái thanh toán -->
+                                    @if (order.PaymentStatus == 1 && order.Status != 5  && order.Status != 4)
+                                    {
+                                        <form asp-action="UpdatePaymentStatus" asp-route-id="@order.OrderID" method="post" class="d-inline"
+                                        onsubmit="return confirm('Xác nhận đã thanh toán?')">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                Thanh toán
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- nút hoàn tiền nếu đã thanh toán -->
+                                    @if (order.PaymentStatus == 2 && order.Status >= 4)
+                                    {
+                                        <form asp-action="UpdatePaymentStatus" asp-route-id="@order.OrderID" method="post" class="d-inline"
+                                        onsubmit="return confirm('Xác nhận đã hoàn tiền?')">
+                                            <button type="submit" class="btn btn-sm btn-warning">
+                                                Hoàn tiền
+                                            </button>
+                                        </form>
+                                    }
+
+                                    @if (order.Status >= 0 && order.Status <= 1)
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@order.OrderID" method="post" style="display:inline"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                Hủy
+                                            </button>
+                                        </form>
+                                    }
+                                    
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center">
+                    @Html.PagedListPager(
+                             Model,
+                             page => Url.Action("Index", new { page }),
+                             new PagedListRenderOptions
+                    {
+                        LiElementClasses = new[] { "page-item" },
+                        PageClasses = new[] { "page-link" },
+                        UlElementClasses = new[] { "pagination", "pagination-sm" },
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always
+                    }
+                             )
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>

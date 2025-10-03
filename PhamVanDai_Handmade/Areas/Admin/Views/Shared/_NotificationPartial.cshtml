@@ -1,0 +1,40 @@
+﻿<script>
+    @if (TempData["success"] != null)
+    {
+        <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: '@Html.Raw(TempData["success"])',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+        </text>
+    }
+
+    @if (TempData["error"] != null)
+    {
+        <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: '@Html.Raw(TempData["error"])',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+        </text>
+    }
+
+    @if (TempData["warning"] != null)
+    {
+        <text>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo!',
+                    text: '@Html.Raw(TempData["warning"])',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+        </text>
+    }
+</script>

@@ -1,0 +1,103 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.ProductFormViewModel
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Quản lý sản phẩm</h1>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <h5 class="card-title">Thông tin sản phẩm</h5>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <img src="~/img/@Model.Product.Image"
+                                     alt="@Model.Product.ProductName"
+                                     class="img-fluid border rounded p-2" />
+                            </div>
+                            <div class="col-md-8">
+                                <p><strong>Tên sản phẩm:</strong> @Model.Product.ProductName</p>
+                                <p><strong>Mô tả ngắn:</strong> @Model.Product.ShortDescription</p>
+                                <p><strong>Mô tả chi tiết:</strong> @Model.Product.Description</p>
+                                <p><strong>Danh mục:</strong> @Model.Product.Category?.CategoryName</p>
+                                <p>
+                                    <strong>Trạng thái:</strong>
+                                    @(Model.Product.Status == 1 ? "Hiển thị" : "Ẩn")
+                                </p>
+                                <p><strong>Ngày tạo:</strong>@Model.Product.CreateAt</p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="card-title">Các biến thể</h5>
+                        @if (Model.Variants != null && Model.Variants.Any())
+                        {
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Màu sắc</th>
+                                        <th>Kích thước</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng tồn kho</th>
+                                        <th>Đã bán</th>
+                                        <th>Ảnh</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var v in Model.Variants)
+                                    {
+                                        <tr>
+                                            <td>@v.Color</td>
+                                            <td>@v.Size</td>
+                                            <td>@v.Price.ToString("N0") đ</td>
+                                            <td>@v.Quantity</td>
+                                            <td>@v.SoldCount</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(v.Image))
+                                                {
+                                                    <img src="~/img/@v.Image"
+                                                         alt="Variant Image"
+                                                         style="width:120px; border:1px solid #ccc; padding:2px;" />
+                                                }
+                                                else
+                                                {
+                                                    <span>Chưa có ảnh</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>Không có biến thể nào cho sản phẩm này.</p>
+                        }
+
+                        <div class="mt-3">
+                            <a asp-action="Index" asp-controller="Product" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Product.ProductID" class="btn btn-primary">
+                                <i class="bi bi-pencil-square"></i> Sửa sản phẩm
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>

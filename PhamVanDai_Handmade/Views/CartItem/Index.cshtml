@@ -1,0 +1,232 @@
+﻿@model List<PhamVanDai_Handmade.Models.ViewModels.CartItemViewModel>
+<!-- Hero Section Begin -->
+<style>
+        .quantity {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .qty-input {
+        width: 60px;
+        height: 40px;
+        text-align: center;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-left: none;
+        border-right: none;
+    }
+
+    .qty-btn {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        background-color: #f5f5f5;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .qty-btn:hover {
+        background-color: #7fad39; /* màu xanh chủ đạo của template Ogani */
+        color: #fff;
+        border-color: #7fad39;
+    }
+    /* Ẩn mũi tên trong input number trên Chrome, Safari, Edge */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Ẩn trên Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+
+</style>
+
+<section class="hero hero-normal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <!--categories-->
+                <vc:categories></vc:categories>
+            </div>
+            <div class="col-lg-9">
+                @Html.Partial("_SearchPartial")
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="../../../User/img/breadcrumb.png">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>Giỏ hàng</h2>
+                    <div class="breadcrumb__option">
+                        <a asp-action="Index" asp-controller="Home">Trang chủ</a>
+                        <span>Giỏ hàng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+<!-- Shoping Cart Section Begin -->
+<section class="shoping-cart spad">
+    <div class="container">
+        @if(@Model.Any())
+        {
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="shoping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="shoping__product">Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th>Tổng giá</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr data-variant="@item.VariantID">
+                                    <td class="shoping__cart__item">
+                                        <img src="~/img/@item.Image" alt="" width="100px">
+                                        <h5>
+                                            @item.ProductName <br /> <br />
+                                            <small>Kích thước: @item.Size | Màu sắc: @item.Color</small>
+                                        </h5>
+
+                                    </td>
+                                    <td class="shoping__cart__price">
+                                        @item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                    </td>
+                                    <td class="shoping__cart__quantity">
+
+                                            <div class="quantity">
+                                                    <button class="qty-btn dec" data-variant="@item.VariantID">-</button>
+                                                    <input type="number" class="qty-input"
+                                                           data-variant="@item.VariantID"
+                                                           value="@item.Quantity"
+                                                           min="1" max="@item.MaxQuantity" />
+                                                    <button class="qty-btn inc" data-variant="@item.VariantID">+</button> 
+                                            </div>
+                                    </td>
+                                    <td class="shoping__cart__total" id="total-@item.VariantID">
+                                        @item.Total.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                    </td>
+                                    <td class="shoping__cart__item__close">
+                                        <form asp-action="Remove" method="post">
+                                            <input type="hidden" name="variantId" value="@item.VariantID" />
+                                            <button type="submit" class="btn"><span class="icon_close"></span></button>
+                                        </form>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="shoping__cart__btns">
+                    <a asp-action="Index" asp-controller="Product" class="primary-btn cart-btn">TIẾP TỤC MUA SẮM</a>
+                    <div class="shoping__checkout col-lg-6 primary-btn cart-btn cart-btn-right">
+                        <h5>Tổng tiền trong giỏ</h5>
+                        <ul>
+                            <li>
+                                Tạm tính:
+                                <span id="cart-total">@Model.Sum(i => i.Total).ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                            </li>
+                        </ul>
+                        <a asp-action="Index" asp-controller="Checkout" class="primary-btn">THANH TOÁN</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        else
+        {
+        <div class="text-center">
+            <h4>Giỏ hàng của bạn đang trống!</h4>
+            <p>Hãy khám phá thêm nhiều sản phẩm và thêm vào đây nhé.</p>
+            <a asp-action="Index" asp-controller="Product" class="primary-btn mt-3">Bắt đầu mua sắm</a>
+        </div>
+        }
+        
+    </div>
+</section>
+<!-- Shoping Cart Section End -->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            function updateQuantity(variantId, newQuantity) {
+                $.ajax({
+                    url: '/CartItem/UpdateQuantity',
+                    type: 'POST',
+                    data: { variantId: variantId, newQuantity: newQuantity },
+                    success: function (res) {
+                        if (res.removed) {
+                            $("tr[data-variant='" + variantId + "']").remove();
+                        } else {
+                            $(".qty-input[data-variant='" + variantId + "']").val(res.quantity);
+                            $("#total-" + variantId).text(res.total.toLocaleString('vi-VN') + " ₫");
+                        }
+                        $("#cart-total").text(res.cartTotal.toLocaleString('vi-VN') + " ₫");
+
+                        if (res.message) {
+                            alert(res.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra, vui lòng thử lại!");
+                    }
+                });
+            }
+
+            $(document).on("click", ".qty-btn.inc", function (e) {
+                e.preventDefault();
+                let variantId = $(this).data("variant");
+                let input = $(".qty-input[data-variant='" + variantId + "']");
+                let value = parseInt(input.val()) + 1;
+                updateQuantity(variantId, value);
+            });
+
+            $(document).on("click", ".qty-btn.dec", function (e) {
+                e.preventDefault();
+                let variantId = $(this).data("variant");
+                let input = $(".qty-input[data-variant='" + variantId + "']");
+                let value = parseInt(input.val()) - 1;
+                updateQuantity(variantId, value);
+            });
+
+            $(document).on("blur", ".qty-input", function () {
+                let variantId = $(this).data("variant");
+                let value = parseInt($(this).val());
+                if (isNaN(value) || value <= 0) value = 1;
+                updateQuantity(variantId, value);
+            });
+
+            $(document).on("keypress", ".qty-input", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $(this).blur();
+                }
+            });
+        });
+    </script>
+}

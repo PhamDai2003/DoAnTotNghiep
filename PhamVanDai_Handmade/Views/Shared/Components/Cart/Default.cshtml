@@ -1,0 +1,4 @@
+﻿@model PhamVanDai_Handmade.Models.ViewModels.CartViewModel
+
+<a asp-action="Index" asp-controller="CartItem"><i class="fa fa-shopping-bag"></i> <span>@Model.TotalItems</span></a>
+<div class="header__cart__price"> &emsp; Tổng: <span>@Model.TotalPrice.ToString("c0", new System.Globalization.CultureInfo("vi-VN"))</span></div>
