@@ -58,11 +58,6 @@ dotnet ef database update
 5. Chạy dự án
 dotnet run
 
-🎯 Mục tiêu đề tài
-Xây dựng một website thương mại điện tử hiện đại, tối ưu trải nghiệm khách hàng
-Hỗ trợ cửa hàng kinh doanh sản phẩm handmade hiệu quả, minh bạch và tiện lợi
-Ứng dụng công nghệ ASP.NET Core và Entity Framework Core vào thực tế
-
 📌 Tác giả
 👤 Phạm Văn Đại
 📧 Email: phamdaimp40@gmail.com
